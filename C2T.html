@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Facture T2C</title>
+  <style>
+    /* ---- POLICE DEJAVU SANS ---- */
+    @font-face {
+      font-family: "DejaVu Sans Local";
+      src: url("./fonts/DejaVuSans.ttf") format("truetype");
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "DejaVu Sans Local";
+      src: url("./fonts/DejaVuSans-Bold.ttf") format("truetype");
+      font-weight: bold;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    body {
+      font-family: "DejaVu Sans Local", "DejaVu Sans", Arial, sans-serif;
+      font-size: 13px;
+      margin: 40px;
+      line-height: 1.2;
+      color: #000;
+      background: #fff;
+    }
+
+    /* ---- EN-TÊTE ---- */
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      margin-bottom: 20px;
+      margin-left: 15px; /* décalage logo + adresse */
+    }
+
+    .header img {
+      height: 105px;
+      margin-right: 18px;
+    }
+
+    .header-text {
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .small {
+      font-size: 13px;
+      margin: 2px 0;
+    }
+
+    /* ---- CORPS PRINCIPAL ---- */
+    .content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-top: 28px;
+      margin-left: 15px; /* décalage du bloc principal */
+    }
+
+    .left-block {
+      flex: 1;
+    }
+
+    .right-block {
+      flex: 0.8;
+      text-align: left;
+      margin-left: 40px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    p {
+      margin: 3px 0;
+    }
+
+    /* ---- PIED DE PAGE ---- */
+    .footer {
+      text-align: left;
+      margin-top: 80px;
+      font-weight: normal;
+      text-transform: uppercase;
+      font-size: 13px;
+    }
+
+    .footer-info {
+      text-align: left;
+      font-size: 12px;
+      margin-top: 40px;
+      font-weight: normal;
+      text-transform: none;
+    }
+
+    /* ---- MODE IMPRESSION PDF ---- */
+    @media print {
+      @page {
+        size: A4;
+        margin: 15mm;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        color: #000;
+        background: #fff !important;
+      }
+
+      .header, .content {
+        margin-left: 25mm; /* centrage propre */
+      }
+
+      .header img {
+        height: 50px;
+      }
+
+      .right-block {
+        margin-left: 35px;
+      }
+
+      .footer, .footer-info {
+        margin-left: 15mm;
+      }
+
+      /* Supprime les liens bleus ou surlignés */
+      a, a:visited {
+        color: #000;
+        text-decoration: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- EN-TÊTE -->
+  <div class="header">
+    <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/2/23/Logo_T2C.svg/768px-Logo_T2C.svg.png" alt="Logo T2C">
+    <div class="header-text">
+      <p>Régie T2C</p>
+      <p class="small">17, bd Robert Schuman La Pardieu</p>
+      <p class="small">63000 Clermont-Ferrand</p>
+      <p class="small">04 73 28 56 56</p>
+      <p class="small">www.t2c.fr</p>
+    </div>
+  </div>
+
+  <br><br>
+
+  <!-- CORPS -->
+  <div class="content">
+    <div class="left-block">
+      <div class="subtitle">Reçu d'achat - PAIEMENT PAR<br>SMS</div>
+      <p id="dateLine"></p>
+      <p id="ticketNum">N° Ticket = </p>
+      <p id="validity"></p>
+    </div>
+
+    <div class="right-block">
+      <p class="bold" style="font-weight:800;">JUSTIFICATIF A CONSERVER</p>
+      <p>1 Voyage<br>
+      Montant HT : 1.45 €<br>
+      TVA (10%) : 0.15 €<br>
+      Montant TTC : 1.60 €</p>
+    </div>
+  </div>
+
+  <!-- PIED -->
+  <div class="footer">NON REMBOURSABLE</div>
+  <div class="footer-info">
+    Conditions générales sur www.T2C.fr ou envoyez AIDE au 93001 (SMS non surtaxé)
+  </div>
+
+  <script>
+    // --- Génération de la date et l'heure actuelles ---
+    const now = new Date();
+    const optionsDate = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+
+    const date = now.toLocaleDateString('fr-FR', optionsDate);
+    const time = now.toLocaleTimeString('fr-FR', optionsTime);
+
+    // --- Calcul de l'heure de fin (+1h10 arrondie à la minute) ---
+    const end = new Date(now.getTime() + (70 * 60000));
+    end.setSeconds(0, 0);
+
+    const endDate = end.toLocaleDateString('fr-FR', optionsDate);
+    const endTime = end.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    // --- Insertion dynamique avec saut de ligne après "au" ---
+    document.getElementById('dateLine').textContent = `Le ${date} à ${time}`;
+    document.getElementById('validity').innerHTML = `Valable du ${date} ${time} au<br>${endDate} ${endTime}`;
+
+    // --- Générateur de ticket XXXXX-XXXXX-XXX utilisant sin/cos ---
+    function generateTicketUsingSinCos() {
+      const seed = Date.now() % 1e9;
+      let s = seed;
+
+      function digitFromState(idx) {
+        const a = Math.abs(Math.sin(s * 0.000001 + idx * 0.123456) * 1e6);
+        const b = Math.abs(Math.cos((s + idx) * 0.000002 + idx * 0.654321) * 1e6);
+        const mix = Math.floor((a + b) % 10);
+        s = (s * 9301 + 49297 + idx * 233) % 233280;
+        return mix;
+      }
+
+      function block(len, startIdx) {
+        let out = "";
+        for (let i = 0; i < len; i++) out += digitFromState(startIdx + i);
+        return out;
+      }
+
+      return `${block(5,1)}-${block(5,11)}-${block(3,21)}`;
+    }
+
+    document.getElementById('ticketNum').textContent = 'N° Ticket = ' + generateTicketUsingSinCos();
+  </script>
+</body>
+</html>
